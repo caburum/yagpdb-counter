@@ -1,0 +1,31 @@
+{{/*
+	Description:   Shows the leaderboard of users who counted the most
+	Trigger:       count top
+	Trigger type:  Command
+	Restrictions:  None
+*/}}
+
+{{$description := ""}}
+{{$wasUserShown := false}}
+ 
+{{range $index, $lb := (dbTopEntries "counter_score" 25 0) -}}
+	{{$formatter := ""}}
+	{{if eq $.User.ID .UserID}}
+		{{$wasUserShown = true}}
+		{{$formatter = "**"}}
+	{{end}}
+	{{$description = joinStr "" $description "\n" $formatter (add $index 1) ": " (.User.Mention) ", score " (humanizeThousands .Value) $formatter}}
+{{end}}
+ 
+{{if not $wasUserShown}}
+	{{$userScore := dbGet .User.ID "counter_score"}}
+	{{$description = joinStr "" $description "\n--------------------\n**" (.User.Mention) ", score " (humanizeThousands $userScore.Value) "**"}}
+{{end}}
+ 
+{{$embed := cembed 
+	"title" "Counting Leaderboard"
+	"description" $description
+	"timestamp" currentTime
+}}
+ 
+{{sendMessage nil $embed}}
