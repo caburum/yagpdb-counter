@@ -1,0 +1,14 @@
+{{/*
+	Description:   Sets number of times a user counted (for leaderboard)
+	Trigger:       count user
+	Trigger type:  Command
+	Restrictions:  Moderators only
+  Usage:         count user <user ID> <number of counts>
+*/}}
+
+{{$args := parseArgs 2 "User ID and new count are required"
+	(carg "userid" "user")
+	(carg "int" "count")
+}}
+ 
+{{dbSet ($args.Get 0) "counter_score" (toInt ($args.Get 1))}}
