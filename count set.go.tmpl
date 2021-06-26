@@ -1,0 +1,14 @@
+{{/*
+	Description:   Sets the last counted number
+	Trigger:       count set
+	Trigger type:  Command
+	Restrictions:  Moderators only
+*/}}
+
+{{$args := parseArgs 2 "Please enter a positive integer"
+	(carg "int" "count" 0)
+}}
+ 
+{{dbSet 0 "counter_count" (add (toInt ($args.Get 0)) 1)}}
+{{$count := dbGet 0 "counter_count"}}
+Next number is `{{humanizeThousands $count.Value}}`
