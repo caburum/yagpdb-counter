@@ -1,0 +1,42 @@
+{{/*
+	Description:   This is the main command which handles verifying the number and updating the database
+	Trigger:       \A
+	Trigger type:  Regex
+	Restrictions:  Only run in counting channel
+*/}}
+
+{{/* First time running command, set up initial values*/}}
+{{$lastUser := dbGet 0 "counter_user"}}
+{{if $lastUser}}
+{{else}}
+	{{dbSet 0 "counter_user" 0}}
+	{{dbSet 0 "counter_count" "1"}}
+{{end}}
+ 
+{{/* Prevent one person to type all the numbers themselves */}}
+{{/* If current user ID matches the user who last successfully ran command */}}
+{{if eq (toFloat $lastUser.Value) (toFloat .User.ID)}}
+	{{deleteTrigger 0}}
+{{else}}
+ 
+{{$next := dbGet 0 "counter_count"}}
+ 
+{{/* If message is equal to the expected next number, update counter */}}
+{{if eq (toInt .StrippedMsg) (toInt ($next.Value))}}
+	{{dbSet 0 "counter_count" (add (toInt ($next.Value)) 1)}}
+ 
+	{{/* Count tracker per user */}}
+	{{$userCount := dbGet .User.ID "counter_score"}}
+	{{if $userCount}}
+		{{dbSet .User.ID "counter_score" (add (toInt ($userCount.Value)) 1)}}
+	{{else}}
+		{{dbSet .User.ID "counter_score" 1}}
+	{{end}}
+ 
+	{{dbSet 0 "counter_user" (toString .User.ID)}}
+{{else}}
+	{{/* Message did not match expected next value */}}
+	{{deleteTrigger 0}}
+{{end}}
+ 
+{{end}}
