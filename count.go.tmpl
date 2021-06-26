@@ -1,0 +1,11 @@
+{{/*
+	Description:   Shows the next number
+	Trigger:       count
+	Trigger type:  Command
+	Restrictions:  None
+*/}}
+
+{{if not .CmdArgs}}
+	{{$count := dbGet 0 "counter_count"}}
+	Next number is `{{humanizeThousands $count.Value}}`
+{{end}}
