@@ -28,7 +28,7 @@
 	{{/* Count tracker per user */}}
 	{{$userCount := dbGet .User.ID "counter_score"}}
 	{{if $userCount}}
-		{{dbSet .User.ID "counter_score" (add (toInt ($userCount.Value)) 1)}}
+		{{dbSet .User.ID "counter_score" (add (toString (toInt ($userCount.Value))) 1)}}
 	{{else}}
 		{{dbSet .User.ID "counter_score" 1}}
 	{{end}}
